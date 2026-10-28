@@ -1,0 +1,22 @@
+from itertools import product
+
+print("P Q R | Q->P P->~Q Q|R | KB")
+
+models = []
+
+for P, Q, R in product([False, True], repeat=3):
+    a = (not Q) or P
+    b = (not P) or (not Q)
+    c = Q or R
+    KB = a and b and c
+
+    print(P, Q, R, "|", a, b, c, "|", KB)
+
+    if KB:
+        models.append((P, Q, R))
+
+print("\nModels of KB:", models)
+
+print("KB entails R:", all(R for P, Q, R in models))
+print("KB entails R->P:", all((not R) or P for P, Q, R in models))
+print("KB entails Q->R:", all((not Q) or R for P, Q, R in models)

@@ -1,0 +1,94 @@
+def calculate_cost(state):
+    n = len(state)
+    conflicts = 0
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            if abs(state[i] - state[j]) == abs(i - j):
+                conflicts += 1
+
+    return conflicts
+
+
+def get_neighbors(state):
+    neighbors = []
+    n = len(state)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            neighbor = state[:]
+            neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
+            neighbors.append((neighbor, i, j))
+
+    return neighbors
+
+
+def print_board(state):
+    n = len(state)
+
+    for row in range(n):
+        for col in range(n):
+            if state[col] == row:
+                print(" Q ", end="")
+            else:
+                print(" . ", end="")
+        print()
+
+
+def hill_climbing(n):
+    state = list(range(n))
+    step = 1
+
+    while True:
+        current_cost = calculate_cost(state)
+
+        print("\n========== STEP", step, "==========")
+        print("Current state:", state)
+        print("Current cost:", current_cost)
+        print_board(state)
+
+        if current_cost == 0:
+            print("Goal state reached!")
+            return state
+
+        neighbors = get_neighbors(state)
+
+        print("\nAll possible neighbors:")
+
+        for idx, (neighbor, i, j) in enumerate(neighbors, 1):
+            print(
+                idx, "Swap x" + str(i), "and x" + str(j),
+                "->", neighbor,
+                "| Cost:", calculate_cost(neighbor)
+            )
+
+        best_neighbor, i, j = min(
+            neighbors,
+            key=lambda item: calculate_cost(item[0])
+        )
+        best_cost = calculate_cost(best_neighbor)
+
+        print("\nBest neighbor:", best_neighbor)
+        print("Best cost:", best_cost)
+
+        if best_cost >= current_cost:
+            print("No better neighbor found.")
+            print("Hill climbing reached a local optimum.")
+            return None
+
+        print("Moving to the best neighbor...")
+        state = best_neighbor
+        step += 1
+
+
+n = int(input("Enter number of queens: "))
+
+if n < 1:
+    print("Enter a positive number.")
+else:
+    solution = hill_climbing(n)
+
+    if solution is not None:
+        print("\nFinal solution:", solution)
+        print("\nFinal chessboard:")
+        print_board(solution)
